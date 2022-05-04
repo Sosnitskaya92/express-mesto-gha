@@ -10,6 +10,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6272c9319d9bcb546a0a5730'
+  };
+
+  next();
+});
+
 app.use('/users', userRouter);
 
 async function main() {
