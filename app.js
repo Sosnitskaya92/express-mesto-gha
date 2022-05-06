@@ -12,14 +12,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '6272c9319d9bcb546a0a5730'
+    _id: '6272c9319d9bcb546a0a5730',
   };
 
   next();
 });
 
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
@@ -31,7 +31,7 @@ async function main() {
   });
 
   app.listen(PORT, () => {
-    console.log(`App listener on port ${PORT}`)
+    console.log(`App listener on port ${PORT}`);
   });
 }
 
