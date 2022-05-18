@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 require('dotenv').config();
 
@@ -31,8 +33,14 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use(auth);
+
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
+
 app.use('*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'Ресурс не найден.' });
 });
