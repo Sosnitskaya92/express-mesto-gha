@@ -1,48 +1,55 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const { Joi, celebrate, errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/NotFoundError');
 
 require('dotenv').config();
-
-const NOT_FOUND = 404;
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
 app.use(cookieParser());
-app.get('/posts', (req) => {
-  console.log(req.cookies.jwt);
-});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6272c9319d9bcb546a0a5730',
-  };
-
-  next();
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+  }).unknown(true),
+}), createUser);
 
 app.use(auth);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 
-app.use('/users', auth, userRouter);
-app.use('/cards', auth, cardRouter);
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден.');
+});
+app.use(errors());
+app.use((err, req, res) => {
+  const { statusCode = 500, message } = err;
 
-app.use('*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Ресурс не найден.' });
+  res.status(statusCode).send({
+    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
+  });
 });
 
 async function main() {
