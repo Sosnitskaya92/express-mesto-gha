@@ -32,24 +32,28 @@ app.post('/signup', celebrate({
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    // eslint-disable-next-line no-useless-escape
+    avatar: Joi.string().pattern(/https?\:\/\/(www\.)?\d?\D{1,}#?/),
   }).unknown(true),
 }), createUser);
 
 app.use(auth);
+
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден.');
 });
+
 app.use(errors());
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
   res.status(statusCode).send({
     message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
   });
+  next();
 });
 
 async function main() {

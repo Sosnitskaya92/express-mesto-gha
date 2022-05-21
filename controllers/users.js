@@ -34,8 +34,9 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Запрашиваемый пользователь не найден');
+      } else {
+        res.status(200).send(user);
       }
-      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -55,9 +56,9 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => {
-      res.send(user);
-    })
+    .then(() => res.status(200).send({
+      name, about, avatar, email,
+    }))
     .catch((err) => {
       if (err.code === DUBLICATE_MONGOOSE_ERROR_CODE) {
         throw new ConflictError('Такой e-mail уже зарегистрирован');

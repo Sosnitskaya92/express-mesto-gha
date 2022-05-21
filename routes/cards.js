@@ -11,25 +11,26 @@ cardRouter.get('/', getCards);
 cardRouter.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required(),
+    // eslint-disable-next-line no-useless-escape
+    link: Joi.string().required().pattern(/https?\:\/\/(www\.)?\d?\D{1,}#?/),
   }),
 }), createCard);
 
 cardRouter.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), deleteCard);
 
 cardRouter.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), likeCard);
 
 cardRouter.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().hex().length(24),
   }),
 }), dislikeCard);
 
