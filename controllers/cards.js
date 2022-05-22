@@ -18,12 +18,11 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -33,7 +32,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Нет такой карточки');
       } else if (JSON.stringify(req.user._id) === JSON.stringify(card.owner)) {
-        Card.findByIdAndRemove(cardId)
+        return Card.findByIdAndRemove(cardId)
           .then((result) => { res.send(result); });
       } else {
         throw new ForbiddenError('Нет прав для удаления данной карточки');
@@ -41,12 +40,11 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -63,12 +61,11 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -85,10 +82,9 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };

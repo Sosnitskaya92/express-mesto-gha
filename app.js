@@ -23,18 +23,17 @@ app.use(cookieParser());
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 }), login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().pattern(/https?\:\/\/(www\.)?\d?\D{1,}#?/),
-  }).unknown(true),
+    avatar: Joi.string().pattern(/(https?:\/\/)(w{3}\.)?(((\d{1,3}\.){3}\d{1,3})|((\w-?)+\.[a-z0-9_-]{2,3}))(:\d{2,5})?((\/.+)+)?\/?#?/m),
+  }),
 }), createUser);
 
 app.use(auth);
